@@ -1,0 +1,61 @@
+# Basics
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*~
+
+# Virtual Environments
+venv/
+env/
+.venv/
+.env
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Alembic / Database
+# migrations are typically committed (alembic/versions/), but compiled files are ignored above.
+# If using SQLite locally, ignore the db file:
+*.sqlite
+*.sqlite3
+*.db
+
+# Unit Test / Coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log

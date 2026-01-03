@@ -8,6 +8,7 @@ class LenderPolicy(Base):
     __tablename__ = "lender_policy"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    file_path = Column(String, nullable=False)
     lender_id = Column(
         Integer,
         ForeignKey("lender.id", ondelete="CASCADE"),

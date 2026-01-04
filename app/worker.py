@@ -14,6 +14,7 @@ if sys.platform == "win32":
 from hatchet_sdk import Hatchet
 from dotenv import load_dotenv
 import logging
+from app.workflows.policy_rules_generation import policy_rules_wf
 
 # Load environment variables
 load_dotenv()
@@ -30,6 +31,8 @@ def main():
 
     # Create a worker
     worker = hatchet.worker("lender-worker")
+
+    worker.register_workflow(policy_rules_wf)
 
     # Start the worker
     worker.start()

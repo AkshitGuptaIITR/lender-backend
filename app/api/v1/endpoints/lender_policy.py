@@ -11,8 +11,11 @@ import uuid
 import shutil
 from sqlalchemy import select
 from app.schemas.lender_policy import LenderPolicyCreate
+from hatchet_sdk import Hatchet
+from app.workflows.policy_rules_generation import InputModel, policy_rules_wf
 
 router = APIRouter()
+hatchet = Hatchet()
 
 
 @router.post("/", response_model=APIResponse[LenderPolicyResponse])
@@ -51,6 +54,12 @@ async def create_lender_policy(
         db.add(policy)
         await db.commit()
         await db.refresh(policy)
+
+        workflow_input = InputModel(
+            lender_id=lender_id, lender_policy_id=policy.id, file_path=file_path
+        )
+
+        hatchet.event.push("policy_rules:create", workflow_input.__dict__)
 
         return APIResponse(data=policy)
 

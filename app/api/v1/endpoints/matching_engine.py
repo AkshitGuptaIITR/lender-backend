@@ -7,11 +7,9 @@ from app.models.matching_engine import MatchingEngine, LenderPolicy
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from app.schemas.lender_policy import LenderPolicyResponse
 
 router = APIRouter()
-
-
-from app.schemas.lender_policy import LenderPolicyResponse
 
 
 @router.post("/", response_model=APIResponse[list[LenderPolicyResponse]])

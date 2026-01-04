@@ -19,6 +19,7 @@ class MatchingEngine(Base):
     matching_tier = Column(String, nullable=True)
     rejection_reason = Column(String, nullable=True)
     fit_score = Column(Integer, nullable=True)
+    loan_amount = Column(Integer, nullable=False)
     lender_policy_id = Column(Integer, ForeignKey("lender_policy.id"), nullable=True)
     lender_policy = relationship("LenderPolicy", back_populates="matching_engines")
     business_id = Column(Integer, ForeignKey("business.id"), nullable=True)

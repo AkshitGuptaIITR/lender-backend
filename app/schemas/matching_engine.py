@@ -13,6 +13,7 @@ class MatchingEngineCreate(BaseModel):
     fico_score: int
     trade_lines: int
     credit_history_flags: str
+    loan_amount: int
 
 
 class MatchingEngineResponse(BaseModel):

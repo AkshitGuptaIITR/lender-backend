@@ -98,6 +98,8 @@ async def create_matching_engine(
                         value = float(value)
                     elif isinstance(input_value, bool):
                         value = value.lower() in ["true", "1", "yes"]
+                    elif isinstance(input_value, str):
+                        value = str(value)
                 except:
                     continue
 

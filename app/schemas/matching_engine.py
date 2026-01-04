@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import Optional
+from app.models.matching_engine import YesNoEnum
 
 
 class MatchingEngineCreate(BaseModel):
@@ -17,11 +19,11 @@ class MatchingEngineCreate(BaseModel):
 
 
 class MatchingEngineResponse(BaseModel):
-    id: int
-    eligibility: str
-    matching_tier: str
-    rejection_reason: str
-    fit_score: int
-    lender_policy_id: int
-    business_id: int
-    personal_guarantor_id: int
+    id: Optional[int]
+    eligibility: Optional[YesNoEnum]
+    matching_tier: Optional[str]
+    rejection_reason: Optional[str]
+    fit_score: Optional[int]
+    lender_policy_id: Optional[int]
+    business_id: Optional[int]
+    personal_guarantor_id: Optional[int]

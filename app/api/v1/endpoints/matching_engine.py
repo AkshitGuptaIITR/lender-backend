@@ -185,26 +185,26 @@ async def create_matching_engine(
                 fit_score = 100
             else:
                 fit_score = round((total_points_earned / possible_points) * 100)
+            matching_engine = MatchingEngine(
+                eligibility=eligibility,
+                matching_tier=matching_tier,
+                rejection_reason=(
+                    ", ".join(rejection_reason) if len(rejection_reason) > 0 else None
+                ),
+                fit_score=fit_score,
+                loan_amount=loan_amount,
+                lender_policy_id=lender_policy_id,
+                business_id=business.id,
+                personal_guarantor_id=personal_guarantor.id,
+            )
+
+            db.add(matching_engine)
+            await db.flush()
+            await db.refresh(matching_engine)
 
             response.append(
                 MatchingEngineResponse(
-                    eligibility=eligibility,
-                    matching_tier=matching_tier,
-                    rejection_reason=(
-                        ", ".join(rejection_reason)
-                        if len(rejection_reason) > 0
-                        else None
-                    ),
-                    fit_score=fit_score,
-                    loan_amount=loan_amount,
-                    lender_policy_id=lender_policy_id,
-                    business_id=business.id,
-                    personal_guarantor_id=personal_guarantor.id,
-                )
-            )
-
-            db.add(
-                MatchingEngine(
+                    id=matching_engine.id,
                     eligibility=eligibility,
                     matching_tier=matching_tier,
                     rejection_reason=(

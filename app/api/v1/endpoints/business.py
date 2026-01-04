@@ -40,3 +40,25 @@ async def create_business(
         return APIResponse(data=business)
     except Exception as e:
         return APIResponse(status="error", message=str(e))
+
+
+@router.get("/", response_model=APIResponse[list[BusinessResponse]])
+async def get_businesses(db: AsyncSession = Depends(get_db)):
+    try:
+        result = await db.execute(select(Business))
+        businesses = result.scalars().all()
+        return APIResponse(data=businesses)
+    except Exception as e:
+        return APIResponse(status="error", message=str(e))
+
+
+@router.get("/{business_id}", response_model=APIResponse[BusinessResponse])
+async def get_business(business_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await db.execute(select(Business).where(Business.id == business_id))
+        business = result.scalar_one_or_none()
+        if not business:
+            raise HTTPException(status_code=404, detail="Business not found")
+        return APIResponse(data=business)
+    except Exception as e:
+        return APIResponse(status="error", message=str(e))

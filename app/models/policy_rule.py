@@ -44,3 +44,7 @@ class PolicyRule(Base):
         index=True,
     )
     lender_policy = relationship("LenderPolicy", back_populates="policy_rules")
+
+    class Config:
+        orm_mode = True
+        from_attributes = True

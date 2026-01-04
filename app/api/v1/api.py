@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     lender_policy,
     business,
     personal_guarantor,
+    matching_engine,
 )
 
 api_router = APIRouter()
@@ -16,4 +17,7 @@ api_router.include_router(
 api_router.include_router(business.router, prefix="/business", tags=["business"])
 api_router.include_router(
     personal_guarantor.router, prefix="/personal-guarantor", tags=["personal_guarantor"]
+)
+api_router.include_router(
+    matching_engine.router, prefix="/matching-engine", tags=["matching_engine"]
 )

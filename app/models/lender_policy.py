@@ -22,3 +22,7 @@ class LenderPolicy(Base):
     matching_engines = relationship(
         "MatchingEngine", back_populates="lender_policy", cascade="all, delete-orphan"
     )
+
+    class Config:
+        orm_mode = True
+        from_attributes = True

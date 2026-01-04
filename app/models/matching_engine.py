@@ -20,12 +20,12 @@ class MatchingEngine(Base):
     rejection_reason = Column(String, nullable=True)
     fit_score = Column(Integer, nullable=True)
     lender_policy_id = Column(Integer, ForeignKey("lender_policy.id"), nullable=True)
-    lender_policy = relationship("LenderPolicy", back_populates="matching_engine")
+    lender_policy = relationship("LenderPolicy", back_populates="matching_engines")
     business_id = Column(Integer, ForeignKey("business.id"), nullable=True)
-    business = relationship("Business", back_populates="matching_engine")
+    business = relationship("Business", back_populates="matching_engines")
     personal_guarantor_id = Column(
         Integer, ForeignKey("personal_guarantor.id"), nullable=True
     )
     personal_guarantor = relationship(
-        "PersonalGuarantor", back_populates="matching_engine"
+        "PersonalGuarantor", back_populates="matching_engines"
     )

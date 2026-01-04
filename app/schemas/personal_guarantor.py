@@ -5,7 +5,7 @@ class PersonalGuarantorCreate(BaseModel):
     fico_score: int
     trade_lines: int
     credit_history_flags: str
-    lender_policy_id: int
+    name: str
 
 
 class PersonalGuarantorResponse(BaseModel):
@@ -13,4 +13,4 @@ class PersonalGuarantorResponse(BaseModel):
     fico_score: int
     trade_lines: int
     credit_history_flags: str
-    lender_policy_id: int
+    name: str

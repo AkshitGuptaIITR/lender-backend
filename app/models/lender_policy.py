@@ -19,11 +19,3 @@ class LenderPolicy(Base):
     policy_rules = relationship(
         "PolicyRule", back_populates="lender_policy", cascade="all, delete-orphan"
     )
-    businesses = relationship(
-        "Business", back_populates="lender_policy", cascade="all, delete-orphan"
-    )
-    personal_guarantors = relationship(
-        "PersonalGuarantor",
-        back_populates="lender_policy",
-        cascade="all, delete-orphan",
-    )

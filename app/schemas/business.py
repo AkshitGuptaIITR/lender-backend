@@ -9,7 +9,6 @@ class BusinessCreate(BaseModel):
     equipment_type: str
     business_duration: int
     paynet_score: int
-    lender_policy_id: int
 
 
 class BusinessResponse(BaseModel):
@@ -21,4 +20,3 @@ class BusinessResponse(BaseModel):
     equipment_type: str
     business_duration: int
     paynet_score: int
-    lender_policy_id: int

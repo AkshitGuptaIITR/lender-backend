@@ -25,14 +25,11 @@ async def create_business(
             equipment_type=business_in.equipment_type,
             business_duration=business_in.business_duration,
             paynet_score=business_in.paynet_score,
-            lender_policy_id=business_in.lender_policy_id,
         )
-        lender_policy = await db.execute(
-            select(LenderPolicy).where(LenderPolicy.id == business_in.lender_policy_id)
-        )
-        lender_policy = lender_policy.scalar_one_or_none()
-        if not lender_policy:
-            raise HTTPException(status_code=404, detail="Lender policy not found")
+        db.add(business)
+        await db.commit()
+        await db.refresh(business)
+        return APIResponse(data=business)
 
         db.add(business)
         await db.commit()

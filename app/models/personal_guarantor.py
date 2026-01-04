@@ -10,10 +10,3 @@ class PersonalGuarantor(Base):
     fico_score = Column(Integer, nullable=False)
     trade_lines = Column(Integer, nullable=False)
     credit_history_flags = Column(String, nullable=False)
-    lender_policy_id = Column(
-        Integer,
-        ForeignKey("lender_policy.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    lender_policy = relationship("LenderPolicy", back_populates="personal_guarantors")

@@ -24,17 +24,8 @@ async def create_personal_guarantor(
             fico_score=personal_guarantor_in.fico_score,
             trade_lines=personal_guarantor_in.trade_lines,
             credit_history_flags=personal_guarantor_in.credit_history_flags,
-            lender_policy_id=personal_guarantor_in.lender_policy_id,
+            name=personal_guarantor_in.name,
         )
-        lender_policy = await db.execute(
-            select(LenderPolicy).where(
-                LenderPolicy.id == personal_guarantor_in.lender_policy_id
-            )
-        )
-        lender_policy = lender_policy.scalar_one_or_none()
-        if not lender_policy:
-            raise HTTPException(status_code=404, detail="Lender policy not found")
-
         db.add(personal_guarantor)
         await db.commit()
         await db.refresh(personal_guarantor)

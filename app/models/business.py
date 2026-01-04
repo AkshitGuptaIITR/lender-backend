@@ -13,10 +13,3 @@ class Business(Base):
     equipment_type = Column(String, nullable=False)
     business_duration = Column(Integer, nullable=False)
     paynet_score = Column(Integer, nullable=False)
-    lender_policy_id = Column(
-        Integer,
-        ForeignKey("lender_policy.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    lender_policy = relationship("LenderPolicy", back_populates="businesses")

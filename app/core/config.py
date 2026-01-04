@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     # Hatchet
     HATCHET_CLIENT_TOKEN: str = ""
 
+    # OpenAI
+    OPENAI_API_KEY: str = ""
+
+    GOOGLE_PROJECT_ID: str = ""
+    GOOGLE_PROJECT_LOCATION: str = ""
+
     # File Uploads
     UPLOAD_DIR: str = "uploads"
 

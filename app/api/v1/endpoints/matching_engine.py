@@ -205,6 +205,8 @@ async def create_matching_engine(
             response.append(
                 MatchingEngineResponse(
                     id=matching_engine.id,
+                    business_name=matching_engine_in.business_name,
+                    personal_guarantor_name=matching_engine_in.personal_guarantor_name,
                     eligibility=eligibility,
                     matching_tier=matching_tier,
                     rejection_reason=(

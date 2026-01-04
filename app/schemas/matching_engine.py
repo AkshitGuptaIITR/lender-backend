@@ -25,5 +25,7 @@ class MatchingEngineResponse(BaseModel):
     rejection_reason: Optional[str]
     fit_score: Optional[int]
     lender_policy_id: Optional[int]
+    business_name: Optional[str]
+    personal_guarantor_name: Optional[str]
     business_id: Optional[int]
     personal_guarantor_id: Optional[int]

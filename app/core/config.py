@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     # Hatchet
     HATCHET_CLIENT_TOKEN: str = ""
 
+    # File Uploads
+    UPLOAD_DIR: str = "uploads"
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

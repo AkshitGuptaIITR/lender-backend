@@ -19,3 +19,6 @@ class LenderPolicy(Base):
     policy_rules = relationship(
         "PolicyRule", back_populates="lender_policy", cascade="all, delete-orphan"
     )
+    matching_engines = relationship(
+        "MatchingEngine", back_populates="lender_policy", cascade="all, delete-orphan"
+    )

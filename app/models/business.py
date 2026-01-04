@@ -13,3 +13,6 @@ class Business(Base):
     equipment_type = Column(String, nullable=False)
     business_duration = Column(Integer, nullable=False)
     paynet_score = Column(Integer, nullable=False)
+    matching_engines = relationship(
+        "MatchingEngine", back_populates="business", cascade="all, delete-orphan"
+    )

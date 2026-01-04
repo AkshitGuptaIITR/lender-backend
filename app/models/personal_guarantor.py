@@ -10,3 +10,8 @@ class PersonalGuarantor(Base):
     fico_score = Column(Integer, nullable=False)
     trade_lines = Column(Integer, nullable=False)
     credit_history_flags = Column(String, nullable=False)
+    matching_engines = relationship(
+        "MatchingEngine",
+        back_populates="personal_guarantor",
+        cascade="all, delete-orphan",
+    )

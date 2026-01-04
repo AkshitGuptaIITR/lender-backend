@@ -23,6 +23,11 @@ async def create_lender_policy(
     db: AsyncSession = Depends(get_db),
 ):
     try:
+        if file.content_type != "application/pdf":
+            raise HTTPException(
+                status_code=400, detail="Invalid file type. Only PDF files are allowed."
+            )
+
         # Check if lender exists
         result = await db.execute(select(Lender).where(Lender.id == lender_id))
         lender = result.scalar_one_or_none()

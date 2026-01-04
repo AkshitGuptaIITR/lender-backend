@@ -23,7 +23,7 @@ client = instructor.from_genai(genai_client)
 class LoanRule(BaseModel):
     field_key: str = Field(
         description="Must be one of: fico_score, paynet_score, business_duration, "
-        "loan_amount, geographic_location, industry_type, equipment_type, other"
+        "loan_amount, geographic_location, industry_type, equipment_type, revenue, other"
     )
     operator: str = Field(
         description="Logical operator: " + ", ".join([op.value for op in Operator])
@@ -59,6 +59,7 @@ def extract_guaranted_rules(text: str):
                     "- 'business_duration' (int): MUST CONVERT years to months (e.g., '2 years' -> 24).\n"
                     "- 'loan_amount' (numeric): Extract the loan amount.\n"
                     "- 'geographic_location' (list[str]): Use for excluded/restricted states (operator: NOT_IN).\n"
+                    "- 'revenue' (numeric): Extract the revenue requirement of business.\n"
                     "- 'industry_type' (list[str]): Use for prohibited industries (operator: NOT_IN).\n"
                     "- 'equipment_type' (str): Use for specific asset restrictions.\n\n"
                     "LOGIC RULES:\n"

@@ -7,135 +7,140 @@ A comprehensive backend service for managing lender policies and eligibility rul
 - **REST API**: Built with FastAPI for high performance and auto-generated documentation.
 - **Database**: PostgreSQL with SQLAlchemy ORM and Alembic for migrations.
 - **Workflow Orchestration**: Uses [Hatchet](https://hatchet.run/) for reliable background task processing (e.g., policy rule generation).
-- **AI Integration**: Integration with Google Cloud for AI/ML tasks (inferred from config).
+- **AI Integration**: Integration with Google Cloud for AI/ML tasks to extract insights from documents.
 
-## Prerequisites
+## Architecture Overview
+
+The system follows a modern microservices-like architecture decoupling the API layer from long-running background processes.
+
+1.  **API Layer (FastAPI)**:
+
+    - Serves as the entry point for all client requests.
+    - Handles synchronous operations like Lender CRUD, Policy Uploads, and Eligibility Checks.
+    - Exposes REST endpoints documented via Swagger/ReDoc.
+
+2.  **Workflow Engine (Hatchet)**:
+
+    - Orchestrates distributed background jobs.
+    - Ensures reliability for long-running tasks.
+    - **Key Workflow**: `policy_rules_generation`. When a policy PDF is uploaded, a background worker picks it up, extracts text, and uses an LLM to generate structured eligibility rules (JSON) which are then saved to the database.
+
+3.  **Data Layer (PostgreSQL)**:
+
+    - The central source of truth.
+    - Stores Lenders, Policy Documents, Extracted Rules (`jsonb`), and Applications.
+
+4.  **AI Integration**:
+    - Utilizes LLMs (via specialized agents) to understand natural language in Lender Policy documents and convert them into computable rules.
+
+## Local Development Setup
+
+### Prerequisites
 
 - **Python** 3.10 or higher
 - **PostgreSQL** 14+
 - **Hatchet Engine** (Self-hosted or Cloud)
 - **Google Cloud Platform** account (for AI services)
 
-## Installation & Setup
+### Installation Steps
 
-### 1. Clone the Repository
+1.  **Clone the Repository**
 
-```bash
-git clone <repository_url>
-cd lender-backend
-```
-
-### 2. Set Up Virtual Environment
-
-It is recommended to use a virtual environment to manage dependencies.
-
-**Windows:**
-
-```powershell
-python -m venv venv
-.\venv\Scripts\activate
-```
-
-**macOS/Linux:**
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configuration
-
-Create a `.env` file in the root directory by copying the example:
-
-**Windows:**
-
-```powershell
-copy .env.example .env
-```
-
-**macOS/Linux:**
-
-```bash
-cp .env.example .env
-```
-
-**Configure the `.env` file:**
-
-Open `.env` and populate the following variables:
-
-- **Database Settings**:
-
-  ```ini
-  POSTGRES_SERVER=localhost
-  POSTGRES_USER=postgres
-  POSTGRES_PASSWORD=your_password
-  POSTGRES_DB=lender_db
-  POSTGRES_PORT=5432
-  ```
-
-- **Hatchet Configuration** (Required for background workers):
-
-  - Generate a Client Token from your Hatchet dashboard.
-
-  ```ini
-  HATCHET_CLIENT_TOKEN= your_hatchet_token_here
-  ```
-
-- **Google Cloud Configuration**:
-  ```ini
-  GOOGLE_PROJECT_ID=your_gcp_project_id
-  GOOGLE_PROJECT_LOCATION=us-central1
-  ```
-
-### 5. Database Setup
-
-1.  Make sure your PostgreSQL server is running.
-2.  Create the database (if not using a tool to do it automatically):
-    ```sql
-    CREATE DATABASE lender_db;
-    ```
-3.  **Run Migrations**: Apply the database schema using Alembic.
     ```bash
+    git clone <repository_url>
+    cd lender-backend
+    ```
+
+2.  **Set Up Virtual Environment**
+
+    **Windows:**
+
+    ```powershell
+    python -m venv venv
+    .\venv\Scripts\activate
+    ```
+
+    **macOS/Linux:**
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install Dependencies**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Configuration**
+
+    Create a `.env` file in the root directory:
+
+    **Windows:**
+
+    ```powershell
+    copy .env.example .env
+    ```
+
+    **macOS/Linux:**
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    **Populate `.env` variables:**
+
+    - `POSTGRES_SERVER`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
+    - `HATCHET_CLIENT_TOKEN` (Generated from Hatchet UI)
+    - `GOOGLE_PROJECT_ID`, `GOOGLE_PROJECT_LOCATION`
+
+5.  **Database Setup**
+
+    Ensure PostgreSQL is running, then apply migrations:
+
+    ```bash
+    # Create DB if needed: CREATE DATABASE lender_db;
     alembic upgrade head
     ```
 
 ## Running the Application
 
-To handle both API requests and background workflows, you need to run two processes: the API server and the Hatchet worker.
+To handle both API requests and background workflows, run these two processes in separate terminals:
 
 ### 1. Start the API Server
-
-The API server handles HTTP requests and exposes the REST endpoints.
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-_The API will be available at `http://localhost:8000`._
+_Access API at: `http://localhost:8000`_
 
 ### 2. Start the Worker
 
-The worker processes background tasks orchestrated by Hatchet (e.g., parsing policies).
-
-Open a **new terminal**, activate the virtual environment, and run:
+The worker executes Hatchet workflows.
 
 ```bash
-# Ensure you are in the root directory and venv is activated
+# Ensure venv is activated
 python -m app.worker
 ```
 
 ## API Documentation
 
-Interactive API documentation is automatically generated by FastAPI:
+Interactive API documentation is automatically generated by FastAPI.
 
 - **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+### Key Endpoints
+
+| Method   | Endpoint                       | Description                                                                |
+| :------- | :----------------------------- | :------------------------------------------------------------------------- |
+| **POST** | `/api/v1/lenders/`             | Onboard a new Lender.                                                      |
+| **POST** | `/api/v1/lender-policies/`     | Upload a Lender Policy PDF. Triggers background extraction.                |
+| **GET**  | `/api/v1/lender-policies/{id}` | Get policy details and extracted rules.                                    |
+| **POST** | `/api/v1/matching-engine/run`  | Run the matching engine to check application eligibility against policies. |
+| **GET**  | `/api/v1/health`               | Health check endpoint.                                                     |
 
 ## Project Structure
 
@@ -143,29 +148,16 @@ Interactive API documentation is automatically generated by FastAPI:
 lender-backend/
 ├── alembic/              # Database migration scripts
 ├── app/
-│   ├── api/             # API route handlers
+│   ├── api/             # API route handlers (v1/endpoints)
 │   ├── core/            # Core config and database logic
 │   ├── models/          # SQLAlchemy database models
 │   ├── schemas/         # Pydantic models for validation
-│   ├── utils/           # Utility functions
-│   ├── workflows/       # Hatchet workflow definitions
+│   ├── utils/           # Utility functions (AI, PDF helpers)
+│   ├── workflows/       # Hatchet workflow definitions (e.g., policy_rules_generation)
 │   ├── main.py          # App entry point
 │   └── worker.py        # Worker entry point
 ├── uploads/              # Directory for file uploads
 ├── .env.example          # Environment variable template
 ├── alembic.ini           # Alembic configuration
-├── requirements.txt      # Python dependencies
-└── README.md             # This file
+└── requirements.txt      # Python dependencies
 ```
-
-## Development Workflow
-
-- **Database Migrations**:
-
-  - Make changes to `app/models`.
-  - Generate a migration: `alembic revision --autogenerate -m "describe changes"`
-  - Apply migration: `alembic upgrade head`
-
-- **Adding Dependencies**:
-  - Install package: `pip install package_name`
-  - Update requirements: `pip freeze > requirements.txt`

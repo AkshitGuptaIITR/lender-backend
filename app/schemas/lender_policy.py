@@ -15,7 +15,6 @@ class LenderPolicyCreate(LenderPolicyBase):
 class LenderPolicyResponse(LenderPolicyBase):
     id: int
     file_path: str
-    policy_rules: list[PolicyRuleResponse] = []
 
     class Config:
         from_attributes = True

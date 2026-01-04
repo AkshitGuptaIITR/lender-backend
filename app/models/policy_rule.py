@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from app.models.base import Base
 from app.models.lender_policy import LenderPolicy
 import enum
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 class RequirementType(str, enum.Enum):
@@ -31,7 +32,7 @@ class PolicyRule(Base):
     __tablename__ = "policy_rule"
     id = Column(Integer, primary_key=True, index=True)
     field_name = Column(String, nullable=False)
-    field_value = Column(String, nullable=False)
+    field_value = Column(JSONB, nullable=False)
     operator = Column(Enum(Operator, name="operator_type"), nullable=False)
     error_message = Column(String, nullable=False)
     requirement_type = Column(

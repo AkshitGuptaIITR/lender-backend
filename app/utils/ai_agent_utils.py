@@ -22,7 +22,8 @@ client = instructor.from_genai(genai_client)
 
 class LoanRule(BaseModel):
     field_key: str = Field(
-        description="The internal key like 'fico_score' or 'paynet_score' or 'business_duration' or 'loan_amount' or 'equipment_type' or 'geographic_location' or 'indrustry' or 'other'"
+        description="Must be one of: fico_score, paynet_score, business_duration, "
+        "loan_amount, geographic_location, industry_type, equipment_type, other"
     )
     operator: str = Field(
         description="Logical operator: " + ", ".join([op.value for op in Operator])
@@ -31,7 +32,10 @@ class LoanRule(BaseModel):
         description="Requirement type: "
         + ", ".join([rt.value for rt in RequirementType])
     )
-    target_value: str = Field(description="The actual value from the PDF")
+    target_value: Union[int, float, List[str], str] = Field(
+        description="The extracted value. Integers for scores/months, "
+        "numeric for amounts, list of strings for states/industries."
+    )
     error_message: str = Field(description="User-friendly rejection reason")
 
 
@@ -48,18 +52,19 @@ def extract_guaranted_rules(text: str):
                 "role": "user",
                 "content": (
                     "SYSTEM INSTRUCTIONS:\n"
-                    "You are a Senior Equipment Finance Underwriter. Convert the following "
-                    "unstructured lender guidelines into a structured rules engine schema.\n\n"
-                    "MAPPING RULES:\n"
-                    "- FICO -> 'fico_score'\n"
-                    "- PayNet -> 'paynet_score'\n"
-                    "- Time in Business -> 'business_duration' (convert to months)\n"
-                    "- Excluded States -> 'geographic_location' (operator: 'NOT_IN')\n"
-                    "- Excluded Industries -> 'industry' (operator: 'NOT_IN')\n"
-                    "- Amounts -> 'loan_amount'\n\n"
-                    "LOGIC:\n"
-                    "- Mandatory = 'HARD_STOP', Preferred = 'SOFT_MATCH'.\n"
-                    f"INPUT TEXT:\n\n{text}"
+                    "Extract lender credit guidelines into the following specific schema.\n\n"
+                    "MAPPING DICTIONARY:\n"
+                    "- 'fico_score' (int): Extract minimum/maximum credit scores.\n"
+                    "- 'paynet_score' (int): Extract business credit requirements.\n"
+                    "- 'business_duration' (int): MUST CONVERT years to months (e.g., '2 years' -> 24).\n"
+                    "- 'loan_amount' (numeric): Extract the loan amount.\n"
+                    "- 'geographic_location' (list[str]): Use for excluded/restricted states (operator: NOT_IN).\n"
+                    "- 'industry_type' (list[str]): Use for prohibited industries (operator: NOT_IN).\n"
+                    "- 'equipment_type' (str): Use for specific asset restrictions.\n\n"
+                    "LOGIC RULES:\n"
+                    "1. Use 'HARD_STOP' for mandatory requirements.\n"
+                    "2. Use 'SOFT_MATCH' for preferred or tiered guidelines.\n"
+                    f"TEXT TO PARSE:\n\n{text}"
                 ),
             },
         ],

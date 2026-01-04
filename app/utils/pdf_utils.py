@@ -12,7 +12,6 @@ def extract_text_from_pdf(file_path: str) -> str:
         extracted_text = []
         for i, res in enumerate(ocr.predict_iter(file_path)):
             extracted_text.append("\n".join(res["rec_texts"]))
-        print(extracted_text)
         return "\n".join(extracted_text)
 
     except Exception as e:

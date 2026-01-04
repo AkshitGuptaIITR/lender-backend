@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from app.utils.pdf_utils import extract_text_from_pdf
 from app.utils.ai_agent_utils import extract_guaranted_rules, LoanRule
 from typing import List
+from app.core.database import get_db
+from app.models.policy_rule import PolicyRule
 
 hatchet = Hatchet()
 
@@ -50,13 +52,14 @@ def pdf_extraction(input: InputModel, context: Context) -> PDFOutputModel:
     parents=[pdf_extraction],
 )
 def policy_rules_generation(
-    input: PDFOutputModel, context: Context
+    input: InputModel, context: Context
 ) -> PolicyRulesOutputModel:
-    policy_rules = extract_guaranted_rules(input.raw_text)
+    pdf_extraction_output = context.task_output(pdf_extraction)
+    policy_rules = extract_guaranted_rules(pdf_extraction_output.raw_text)
     return PolicyRulesOutputModel(
         policy_rules=policy_rules.rules,
-        lender_id=input.lender_id,
-        lender_policy_id=input.lender_policy_id,
+        lender_id=pdf_extraction_output.lender_id,
+        lender_policy_id=pdf_extraction_output.lender_policy_id,
     )
 
 
@@ -66,6 +69,20 @@ def policy_rules_generation(
     schedule_timeout=300,
     parents=[policy_rules_generation],
 )
-def policy_rules_save(input: PolicyRulesOutputModel, context: Context) -> None:
-    print("policy_rules_save", input)
-    pass
+async def policy_rules_save(input: InputModel, context: Context) -> None:
+    policy_rules_generation_output = context.task_output(policy_rules_generation)
+    async for db in get_db():
+        db.add_all(
+            [
+                PolicyRule(
+                    lender_policy_id=input.lender_policy_id,
+                    field_name=policy_rule.field_key,
+                    field_value=policy_rule.target_value,
+                    operator=policy_rule.operator,
+                    error_message=policy_rule.error_message,
+                    requirement_type=policy_rule.requirement_type,
+                )
+                for policy_rule in policy_rules_generation_output.policy_rules
+            ]
+        )
+        await db.commit()

@@ -5,6 +5,11 @@ from app.models.lender_policy import LenderPolicy
 import enum
 
 
+class RequirementType(str, enum.Enum):
+    HARD_STOP = "HARD_STOP"
+    SOFT_MATCH = "SOFT_MATCH"
+
+
 class Operator(str, enum.Enum):
     EQUAL = "EQUAL"
     NOT_EQUAL = "NOT_EQUAL"
@@ -18,6 +23,8 @@ class Operator(str, enum.Enum):
     NOT_LIKE = "NOT_LIKE"
     IS = "IS"
     IS_NOT = "IS_NOT"
+    CONTAINS = "CONTAINS"
+    NOT_CONTAINS = "NOT_CONTAINS"
 
 
 class PolicyRule(Base):
@@ -26,6 +33,10 @@ class PolicyRule(Base):
     field_name = Column(String, nullable=False)
     field_value = Column(String, nullable=False)
     operator = Column(Enum(Operator, name="operator_type"), nullable=False)
+    error_message = Column(String, nullable=False)
+    requirement_type = Column(
+        Enum(RequirementType, name="requirement_type"), nullable=False
+    )
     lender_policy_id = Column(
         Integer,
         ForeignKey("lender_policy.id", ondelete="CASCADE"),

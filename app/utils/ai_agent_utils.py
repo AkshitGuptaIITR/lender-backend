@@ -7,6 +7,7 @@ from vertexai.generative_models import GenerativeModel
 import vertexai
 import os
 from google import genai
+from typing import Union
 
 os.environ["GOOGLE_CLOUD_PROJECT"] = settings.GOOGLE_PROJECT_ID
 
